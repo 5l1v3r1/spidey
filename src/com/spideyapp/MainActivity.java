@@ -39,6 +39,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 
 import com.espian.showcaseview.OnShowcaseEventListener;
@@ -224,49 +225,46 @@ public class MainActivity extends Activity {
 	
 	private void runScan() {
 
-		if (this.isProperNetworkState())
-		{
-
-			mMapFragment.startLocationLookup();
-			mMapFragment.clearOverlays();
-			
-			// Set an EditText view to get user input 
-			final EditText input = new EditText(this);
-			
-			new AlertDialog.Builder(this)
-		    .setTitle(R.string.scan_name)
-		    .setMessage(R.string.please_enter_a_name_for_this_scan_your_location_place_etc_)
-		    .setView(input)
-		    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int whichButton) {
-		        	
-		            Editable value = input.getText(); 
-		            
-		            Intent intent = new Intent(MainActivity.this, ScanService.class); 
-		            intent.putExtra("scanname", value.toString());
-		            
-		            Location loc = mMapFragment.getLastLocation();
-		            if (loc != null)
-		            {
-		            	intent.putExtra("lat",loc.getLatitude());
-		            	intent.putExtra("lon",loc.getLongitude());
-		            }
-		    		//start the background scan
-		    		startService(intent);
-		    		
-		        }
-		    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int whichButton) {
-		            // Do nothing.
-		        }
-		    }).show();
-		}
+		mMapFragment.startLocationLookup();
+		mMapFragment.clearOverlays();
+		
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		
+		new AlertDialog.Builder(this)
+	    .setTitle(R.string.scan_name)
+	    .setMessage(R.string.please_enter_a_name_for_this_scan_your_location_place_etc_)
+	    .setView(input)
+	    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	        	
+	            Editable value = input.getText(); 
+	            
+	            Intent intent = new Intent(MainActivity.this, ScanService.class); 
+	            intent.putExtra("scanname", value.toString());
+	            
+	            Location loc = mMapFragment.getLastLocation();
+	            if (loc != null)
+	            {
+	            	intent.putExtra("lat",loc.getLatitude());
+	            	intent.putExtra("lon",loc.getLongitude());
+	            }
+	    		//start the background scan
+	    		startService(intent);
+	    		
+	        }
+	    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	            // Do nothing.
+	        }
+	    }).show();
+	/**
 		else
 		{
 			
 			new AlertDialog.Builder(this)
 		    .setTitle(R.string.required_mobile_settings)
-		    .setMessage(R.string.please_uncheck_data_enabled_and_set_preferred_network_type_to_2g_on_the_mobile_network_settings_screen_click_ok_to_open_it_now_)		    
+		    .setMessage()		    
 		    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int whichButton) {
 		        	Intent intent = new Intent();
@@ -282,7 +280,7 @@ public class MainActivity extends Activity {
 		    }).show();
 
 	      
-		}
+		}**/
 		
 
 	}
@@ -462,6 +460,9 @@ public class MainActivity extends Activity {
 		
 		public void startLocationLookup() {
 			
+			if (lastLocation == null)
+				lastLocation = new Location ("0,0");
+			
 			if (locationclient == null)
 			{
 				locationclient = new LocationClient(this.getActivity()
@@ -564,7 +565,8 @@ public class MainActivity extends Activity {
 	    	  int cellId = bundle.getInt("cid");
 	    	  int dbm = bundle.getInt("dbm");
 	       
-	    	  mMapFragment.addCircleOverlay(cellId+"", mMapFragment.getLastLocation().getLatitude(), mMapFragment.getLastLocation().getLongitude(), dbm);
+	    	  if (mMapFragment != null && mMapFragment.getLastLocation() != null)
+	    		  mMapFragment.addCircleOverlay(cellId+"", mMapFragment.getLastLocation().getLatitude(), mMapFragment.getLastLocation().getLongitude(), dbm);
 	      }
 	    }
 	  };
@@ -624,6 +626,7 @@ public class MainActivity extends Activity {
 		          default:
 		              return true;
 		          }
+		    	  
 		      }
 		  }
 	  

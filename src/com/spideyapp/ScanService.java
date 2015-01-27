@@ -137,7 +137,7 @@ public class ScanService extends Service {
 
 
 	private void startLegacyScan() {
-		logMessage("starting tower scan (old stylie)... ");
+		logMessage("starting tower scan... ");
 
 		Scan scan = new Scan();
 
